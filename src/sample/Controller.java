@@ -22,16 +22,13 @@ public class Controller {
     @FXML
     private TextField columnTextField;
 
-    @FXML
-    private Button stopButton;
-
-    @FXML
-    private Button resetButton;
+    private int columnCount;
+    private int rowCount;
+    private boolean[][] initialBoard;
+    private boolean[][] destinationBoard;
 
     private ForkJoinPool forkJoinPool = new ForkJoinPool();
-
-    private Integer columnCount;
-    private Integer rowCount;
+    private Cell[][] rectangles;
     private AtomicBoolean keepRunning = new AtomicBoolean(true);
 
     public void runApplication() {
@@ -48,11 +45,6 @@ public class Controller {
             }
         };
     }
-
-    private  boolean[][] initialBoard;
-    private boolean[][] destinationBoard;
-    private Cell[][] rectangles;
-
 
     public void start() {
         while (keepRunning.get()) {
