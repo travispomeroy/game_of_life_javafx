@@ -2,7 +2,7 @@ package sample;
 
 import java.util.concurrent.RecursiveAction;
 
-public class GameOfLifeAdvancer extends RecursiveAction {
+public class CellGenerationAction extends RecursiveAction {
 
     private boolean[][] initialBoard;
     private boolean[][] destinationBoard;
@@ -11,7 +11,7 @@ public class GameOfLifeAdvancer extends RecursiveAction {
     private int startColumn;
     private int endColumn;
 
-    public GameOfLifeAdvancer(boolean[][] initialBoard, boolean[][] destinationBoard, int startRow, int endRow, int startColumn, int endColumn) {
+    public CellGenerationAction(boolean[][] initialBoard, boolean[][] destinationBoard, int startRow, int endRow, int startColumn, int endColumn) {
         this.initialBoard = initialBoard;
         this.destinationBoard = destinationBoard;
         this.startRow = startRow;
@@ -50,17 +50,17 @@ public class GameOfLifeAdvancer extends RecursiveAction {
     }
 
     private void splitGridUpByRows(int halfRows) {
-        invokeAll(new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow,
-                                         startRow + halfRows, startColumn, endColumn),
-                new GameOfLifeAdvancer(initialBoard,
-                destinationBoard, startRow + halfRows, endRow, startColumn, endColumn));
+        invokeAll(new CellGenerationAction(initialBoard, destinationBoard, startRow,
+                                           startRow + halfRows, startColumn, endColumn),
+                new CellGenerationAction(initialBoard,
+                                         destinationBoard, startRow + halfRows, endRow, startColumn, endColumn));
     }
 
     private void splitGridUpByColumns(int halfColumn) {
-        invokeAll(new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow,
-                                         endRow, startColumn , startColumn + halfColumn),
-                  new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow, endRow,
-                                         startColumn + halfColumn, endColumn));
+        invokeAll(new CellGenerationAction(initialBoard, destinationBoard, startRow,
+                                           endRow, startColumn , startColumn + halfColumn),
+                  new CellGenerationAction(initialBoard, destinationBoard, startRow, endRow,
+                                           startColumn + halfColumn, endColumn));
     }
 
     private void computeDirectly() {
@@ -69,21 +69,13 @@ public class GameOfLifeAdvancer extends RecursiveAction {
                 int numberOfNeighbors = getNumberOfNeighbors(row, column);
 
                 if (initialBoard[row][column]) {
-                    destinationBoard[row][column] = true;
-
-                    if (numberOfNeighbors < 2) {
-                        destinationBoard[row][column] = false;
-                    }
+                    destinationBoard[row][column] = numberOfNeighbors >= 2;
 
                     if (numberOfNeighbors > 3) {
                         destinationBoard[row][column] = false;
                     }
                 } else {
-                    destinationBoard[row][column] = false;
-
-                    if (numberOfNeighbors == 3) {
-                        destinationBoard[row][column] = true;
-                    }
+                    destinationBoard[row][column] = numberOfNeighbors == 3;
                 }
             }
         }
@@ -93,23 +85,14 @@ public class GameOfLifeAdvancer extends RecursiveAction {
         int neighborCount = 0;
         for (int leftIndex = -1; leftIndex < 2; leftIndex++) {
             for (int topIndex = -1; topIndex < 2; topIndex++) {
-                if ((leftIndex == 0) && (topIndex == 0)) {
-                    continue;
-                }
-
                 int neighbourRowIndex = row + leftIndex;
                 int neighbourColIndex = col + topIndex;
 
-                if (neighbourRowIndex < 0) {
-                    neighbourRowIndex = initialBoard.length + neighbourRowIndex;
+                if (isCenterCellOrOffGrid(leftIndex, topIndex, neighbourRowIndex, neighbourColIndex)) {
+                    continue;
                 }
 
-                if (neighbourColIndex < 0) {
-                    neighbourColIndex = initialBoard[0].length + neighbourColIndex;
-                }
-
-                boolean neighbour =
-                        initialBoard[neighbourRowIndex % initialBoard.length][neighbourColIndex % initialBoard[0].length];
+                boolean neighbour = initialBoard[neighbourRowIndex][neighbourColIndex];
 
                 if (neighbour) {
                     neighborCount++;
@@ -118,5 +101,17 @@ public class GameOfLifeAdvancer extends RecursiveAction {
         }
 
         return neighborCount;
+    }
+
+    private boolean isCenterCellOrOffGrid(int leftIndex, int topIndex, int neighbourRowIndex, int neighbourColIndex) {
+        return isCenterCell(leftIndex, topIndex) || isOffGrid(neighbourRowIndex, neighbourColIndex);
+    }
+
+    private boolean isOffGrid(int neighbourRowIndex, int neighbourColIndex) {
+        return (neighbourRowIndex < 0 || neighbourColIndex < 0) || (neighbourRowIndex >= initialBoard.length || neighbourColIndex >= initialBoard[0].length);
+    }
+
+    private boolean isCenterCell(int leftIndex, int topIndex) {
+        return (leftIndex == 0) && (topIndex == 0);
     }
 }

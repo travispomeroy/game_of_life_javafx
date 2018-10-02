@@ -3,7 +3,6 @@ package sample;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -13,6 +12,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller {
 
+    public static final double GRID_HEIGHT = 474.0;
+    public static final double GRID_WIDTH = 400.0;
     @FXML
     private GridPane gridPane;
 
@@ -46,7 +47,7 @@ public class Controller {
         };
     }
 
-    public void start() {
+    public void start() throws InterruptedException {
         while (keepRunning.get()) {
             calculateNeighbors();
             updateView();
@@ -56,9 +57,9 @@ public class Controller {
     }
 
     private void calculateNeighbors() {
-        GameOfLifeAdvancer gameOfLifeAdvancer = new GameOfLifeAdvancer(initialBoard,
-                                                                       destinationBoard, 0, initialBoard.length, 0, initialBoard[0].length);
-        forkJoinPool.invoke(gameOfLifeAdvancer);
+        CellGenerationAction cellGenerationAction = new CellGenerationAction(initialBoard,
+                                                                             destinationBoard, 0, initialBoard.length, 0, initialBoard[0].length);
+        forkJoinPool.invoke(cellGenerationAction);
     }
 
     private void resetBoard() {
@@ -66,12 +67,8 @@ public class Controller {
         destinationBoard = new boolean[rowCount][columnCount];
     }
 
-    private void sleep() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private void sleep() throws InterruptedException {
+        Thread.sleep(500);
     }
 
     private void updateView() {
@@ -90,8 +87,8 @@ public class Controller {
         rowCount = Integer.valueOf(this.rowTextField.getText());
         columnCount = Integer.valueOf(this.columnTextField.getText());
 
-        double cellHeight = 474.0 / rowCount;
-        double cellWidth = 400.0 / columnCount;
+        double cellHeight = GRID_HEIGHT / rowCount;
+        double cellWidth = GRID_WIDTH / columnCount;
 
         Dimensions dimensions = new Dimensions(cellHeight, cellWidth);
 
