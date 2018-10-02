@@ -27,8 +27,10 @@ public class CellGenerationAction extends RecursiveAction {
             return;
         }
 
-        int halfRows = (endRow - startColumn) / 2;
+        int halfRows = (endRow - startRow) / 2;
         int halfColumn = (endColumn - startColumn) / 2;
+
+//        System.out.println("End Row: " + endRow + ", End Column: " + endColumn + ", Half Rows: " + (endRow -));
 
         if (gridHasMoreRowsThanColumns(halfRows, halfColumn)) {
             splitGridUpByRows(halfRows);
@@ -63,7 +65,7 @@ public class CellGenerationAction extends RecursiveAction {
                                            startColumn + halfColumn, endColumn));
     }
 
-    private void computeDirectly() {
+    void computeDirectly() {
         for (int row = startRow; row < endRow; row++) {
             for (int column = startColumn; column < endColumn; column++) {
                 int numberOfNeighbors = getNumberOfNeighbors(row, column);

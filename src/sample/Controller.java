@@ -1,8 +1,11 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -23,8 +26,15 @@ public class Controller {
     @FXML
     private TextField columnTextField;
 
+    @FXML
+    private Label timeLabel;
+
+    @FXML
+    private RadioButton multiThreadedRadioButton;
+
     private int columnCount;
     private int rowCount;
+    private long generationCount = 0;
     private boolean[][] initialBoard;
     private boolean[][] destinationBoard;
 
@@ -49,17 +59,26 @@ public class Controller {
 
     public void start() throws InterruptedException {
         while (keepRunning.get()) {
-            calculateNeighbors();
+            generationCount++;
+            long startTime = System.nanoTime();
+            calculateNeighbors(multiThreadedRadioButton.isSelected());
+            long endTime = System.nanoTime();
+            long elapsedTime = (endTime - startTime) / 1000;
+            Platform.runLater(() -> this.timeLabel.setText("Generation " + generationCount + ": " + elapsedTime + "ms"));
             updateView();
             resetBoard();
             sleep();
         }
     }
 
-    private void calculateNeighbors() {
+    private void calculateNeighbors(boolean usingMultiThreadedApproach) {
         CellGenerationAction cellGenerationAction = new CellGenerationAction(initialBoard,
                                                                              destinationBoard, 0, initialBoard.length, 0, initialBoard[0].length);
-        forkJoinPool.invoke(cellGenerationAction);
+        if (usingMultiThreadedApproach) {
+            forkJoinPool.invoke(cellGenerationAction);
+        } else {
+            cellGenerationAction.computeDirectly();
+        }
     }
 
     private void resetBoard() {
@@ -114,6 +133,8 @@ public class Controller {
 
     public void stopApplication(MouseEvent mouseEvent) {
         this.keepRunning.set(false);
+        this.generationCount = 0;
+        this.timeLabel.setText("Generation " + 1 + ": ");
     }
 
     public void resetGrid(MouseEvent mouseEvent) {
