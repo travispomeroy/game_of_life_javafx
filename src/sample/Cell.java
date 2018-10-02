@@ -42,11 +42,15 @@ public class Cell {
         node.setFill(WHITE);
         node.setStroke(Color.BLACK);
         node.setStrokeType(StrokeType.INSIDE);
-        node.setOnMouseClicked(this::onMouseClick);
+        node.setOnDragDetected(event -> {node.startFullDrag();});
+        node.setOnMouseDragOver(this::onMouseClick);
+        node.setOnMousePressed(event -> event.setDragDetect(true));
+        node.setOnMouseDragged(event -> event.setDragDetect(false));
         return node;
     }
 
     private void onMouseClick(MouseEvent mouseEvent) {
+        mouseEvent.setDragDetect(true);
         if (this.rectangle.getFill().equals(BLUE)) {
             this.rectangle.setFill(WHITE);
         } else {

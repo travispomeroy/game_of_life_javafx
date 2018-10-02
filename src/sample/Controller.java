@@ -140,4 +140,8 @@ public class Controller {
     public void resetGrid(MouseEvent mouseEvent) {
         gridPane.getChildren().clear();
     }
+
+    public void mouseDrag(MouseEvent mouseEvent) {
+
+    }
 }

@@ -30,8 +30,6 @@ public class CellGenerationAction extends RecursiveAction {
         int halfRows = (endRow - startRow) / 2;
         int halfColumn = (endColumn - startColumn) / 2;
 
-//        System.out.println("End Row: " + endRow + ", End Column: " + endColumn + ", Half Rows: " + (endRow -));
-
         if (gridHasMoreRowsThanColumns(halfRows, halfColumn)) {
             splitGridUpByRows(halfRows);
         } else {
