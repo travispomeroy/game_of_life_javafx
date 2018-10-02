@@ -77,43 +77,6 @@ public class Controller {
             initialBoard = destinationBoard;
             destinationBoard = new boolean[rowCount][columnCount];
 
-
-
-
-
-
-
-
-
-
-//            for (int row = 0; row < initialBoard.length; row++) {
-//                for (int col = 0; col < initialBoard.length; col++) {
-//                    int numberOfNeighbors = getNumberOfNeighbors(row, col);
-//
-//                    if (initialBoard[row][col]) {
-//                        destinationBoard[row][col] = true;
-//
-//                        if (numberOfNeighbors < 2) {
-//                            destinationBoard[row][col] = false;
-//                        }
-//
-//                        if (numberOfNeighbors > 3) {
-//                            destinationBoard[row][col] = false;
-//                        }
-//                    } else {
-//                        destinationBoard[row][col] = false;
-//
-//                        if (numberOfNeighbors == 3) {
-//                            destinationBoard[row][col] = true;
-//                        }
-//                    }
-//                }
-//            }
-//
-//
-//            printBoard();
-//            initialBoard = destinationBoard;
-//            destinationBoard = new boolean[rowCount][columnCount];
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -136,7 +99,10 @@ public class Controller {
 
     public void createGrid(MouseEvent mouseEvent) {
         rowCount = Integer.valueOf(this.rowTextField.getText());
+        double cellHeight = 474.0 / rowCount;
+
         columnCount = Integer.valueOf(this.columnTextField.getText());
+        double cellWidth = 400.0 / columnCount;
 
         rectangles = new Cell[rowCount][columnCount];
         initialBoard = new boolean[rowCount][columnCount];
@@ -147,8 +113,8 @@ public class Controller {
                 Rectangle node = new Rectangle();
                 node.setArcHeight(5.0);
                 node.setArcWidth(5.0);
-                node.setHeight(96.0);
-                node.setWidth(80.0);
+                node.setHeight(cellHeight);
+                node.setWidth(cellWidth);
                 node.setFill(WHITE);
                 node.setStroke(Color.BLACK);
                 node.setStrokeType(StrokeType.INSIDE);
@@ -165,25 +131,13 @@ public class Controller {
                     }
                 });
 
-                RowConstraints rowConstraints = new RowConstraints();
-                rowConstraints.setMinHeight(10.0);
-                rowConstraints.setPrefHeight(30.0);
-                rowConstraints.setVgrow(Priority.SOMETIMES);
-
-                gridPane.getRowConstraints().add(rowConstraints);
-
-                ColumnConstraints columnConstraints = new ColumnConstraints();
-                columnConstraints.setMinWidth(10.0);
-                columnConstraints.setPrefWidth(100.0);
-                columnConstraints.setHgrow(Priority.SOMETIMES);
-
-                gridPane.getColumnConstraints().add(columnConstraints);
-                GridPane.setHgrow(node, Priority.ALWAYS);
-                GridPane.setVgrow(node, Priority.ALWAYS);
                 rectangles[i][j] = new Cell(node, i, j);
                 gridPane.add(node, j, i);
             }
         }
+
+        System.out.println(gridPane.getHeight());
+        System.out.println(gridPane.getWidth());
     }
 
     public void stopApplication(MouseEvent mouseEvent) {
