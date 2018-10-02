@@ -6,19 +6,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static sample.Cell.BLUE;
-import static sample.Cell.WHITE;
 
 public class Controller {
 
@@ -64,28 +55,34 @@ public class Controller {
 
 
     public void start() {
-
-
         while (keepRunning.get()) {
-
-            GameOfLifeAdvancer gameOfLifeAdvancer = new GameOfLifeAdvancer(initialBoard,
-                    destinationBoard, 0, initialBoard.length-1, 0, initialBoard[0].length - 1);
-
-            forkJoinPool.invoke(gameOfLifeAdvancer);
-
-            printBoard();
-            initialBoard = destinationBoard;
-            destinationBoard = new boolean[rowCount][columnCount];
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            calculateNeighbors();
+            updateView();
+            resetBoard();
+            sleep();
         }
     }
 
-    private void printBoard() {
+    private void calculateNeighbors() {
+        GameOfLifeAdvancer gameOfLifeAdvancer = new GameOfLifeAdvancer(initialBoard,
+                                                                       destinationBoard, 0, initialBoard.length - 1, 0, initialBoard[0].length - 1);
+        forkJoinPool.invoke(gameOfLifeAdvancer);
+    }
+
+    private void resetBoard() {
+        initialBoard = destinationBoard;
+        destinationBoard = new boolean[rowCount][columnCount];
+    }
+
+    private void sleep() {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateView() {
         for (int i = 0; i < destinationBoard.length; i++) {
             for (int j = 0; j < destinationBoard.length; j++) {
                 if (destinationBoard[i][j]) {
@@ -99,10 +96,12 @@ public class Controller {
 
     public void createGrid(MouseEvent mouseEvent) {
         rowCount = Integer.valueOf(this.rowTextField.getText());
-        double cellHeight = 474.0 / rowCount;
-
         columnCount = Integer.valueOf(this.columnTextField.getText());
+
+        double cellHeight = 474.0 / rowCount;
         double cellWidth = 400.0 / columnCount;
+
+        Dimensions dimensions = new Dimensions(cellHeight, cellWidth);
 
         rectangles = new Cell[rowCount][columnCount];
         initialBoard = new boolean[rowCount][columnCount];
@@ -110,34 +109,18 @@ public class Controller {
 
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
-                Rectangle node = new Rectangle();
-                node.setArcHeight(5.0);
-                node.setArcWidth(5.0);
-                node.setHeight(cellHeight);
-                node.setWidth(cellWidth);
-                node.setFill(WHITE);
-                node.setStroke(Color.BLACK);
-                node.setStrokeType(StrokeType.INSIDE);
-                node.setOnMouseClicked(event -> {
-                    int rowIndex = GridPane.getRowIndex((Node) event.getSource());
-                    int columnIndex = GridPane.getColumnIndex(((Node) event.getSource()));
-
-                    if (node.getFill().equals(BLUE)) {
-                        initialBoard[rowIndex][columnIndex] = false;
-                        node.setFill(WHITE);
-                    } else {
-                        initialBoard[rowIndex][columnIndex] = true;
-                        node.setFill(BLUE);
-                    }
-                });
-
-                rectangles[i][j] = new Cell(node, i, j);
-                gridPane.add(node, j, i);
+                Cell cell = new Cell(dimensions, i, j);
+                cell.addOnMouseClickedEvent(event -> updateInitialBoard(cell, event));
+                rectangles[i][j] = cell;
+                gridPane.add(cell.getRectangle(), j, i);
             }
         }
+    }
 
-        System.out.println(gridPane.getHeight());
-        System.out.println(gridPane.getWidth());
+    private void updateInitialBoard(Cell cell, MouseEvent event) {
+        int rowIndex = GridPane.getRowIndex((Node) event.getSource());
+        int columnIndex = GridPane.getColumnIndex(((Node) event.getSource()));
+        initialBoard[rowIndex][columnIndex] = cell.isCellBlue();
     }
 
     public void stopApplication(MouseEvent mouseEvent) {
