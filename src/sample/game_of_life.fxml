@@ -89,12 +89,8 @@
                   <TextField fx:id="columnTextField" layoutX="71.0" layoutY="293.0" prefHeight="27.0" prefWidth="133.0" />
                   <Label layoutX="15.0" layoutY="262.0" text="Row" />
                   <Label layoutX="14.0" layoutY="298.0" text="Column" />
-                  <Button fx:id="stopButton" layoutX="16.0" layoutY="157.0"
-                          mnemonicParsing="false" onMouseClicked="#stopApplication"
-                          prefHeight="27.0" prefWidth="189.0" text="Stop"  />
-                  <Button fx:id="resetButton" layoutX="16.0" layoutY="197.0"
-                          mnemonicParsing="false" onMouseClicked="#resetGrid"
-                          prefHeight="23.0" prefWidth="189.0" text="Reset" />
+                  <Button fx:id="stopButton" layoutX="16.0" layoutY="157.0" mnemonicParsing="false" onMouseClicked="#stopApplication" prefHeight="27.0" prefWidth="189.0" text="Stop" />
+                  <Button fx:id="resetButton" layoutX="16.0" layoutY="197.0" mnemonicParsing="false" onMouseClicked="#resetGrid" prefHeight="23.0" prefWidth="189.0" text="Reset" />
           </children>
         </AnchorPane>
         <ScrollPane prefHeight="-1.0" prefWidth="-1.0">
@@ -102,8 +98,7 @@
             <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0" prefHeight="545.0" prefWidth="430.0">
               <children>
                 <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="View" textAlignment="CENTER" textFill="$x2" wrapText="false" />
-                        <GridPane fx:id="gridPane" layoutX="14.0" layoutY="51.0"
-                                  prefHeight="474.0" prefWidth="400.0">
+                        <GridPane fx:id="gridPane" layoutX="14.0" layoutY="51.0" prefHeight="474.0" prefWidth="400.0">
                         </GridPane>
               </children>
             </AnchorPane>
@@ -111,7 +106,8 @@
         </ScrollPane>
         <AnchorPane>
           <children>
-            <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+            <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="Calculation Time" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                  <Label layoutX="14.0" layoutY="47.0" text="Generation 1:" />
           </children>
         </AnchorPane>
       </items>
