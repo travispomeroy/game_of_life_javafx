@@ -57,7 +57,7 @@ public class Controller {
 
     private void calculateNeighbors() {
         GameOfLifeAdvancer gameOfLifeAdvancer = new GameOfLifeAdvancer(initialBoard,
-                                                                       destinationBoard, 0, initialBoard.length - 1, 0, initialBoard[0].length - 1);
+                                                                       destinationBoard, 0, initialBoard.length, 0, initialBoard[0].length);
         forkJoinPool.invoke(gameOfLifeAdvancer);
     }
 

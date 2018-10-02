@@ -22,7 +22,7 @@ public class GameOfLifeAdvancer extends RecursiveAction {
 
     @Override
     protected void compute() {
-        if (getArea() < 20) {
+        if (isGridSmallEnoughToComputeDirectly()) {
             computeDirectly();
             return;
         }
@@ -30,22 +30,42 @@ public class GameOfLifeAdvancer extends RecursiveAction {
         int halfRows = (endRow - startColumn) / 2;
         int halfColumn = (endColumn - startColumn) / 2;
 
-        if (halfRows > halfColumn) {
-            invokeAll(new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow,
-                    startRow + halfRows, startColumn, endColumn),
-                    new GameOfLifeAdvancer(initialBoard,
-                    destinationBoard, startRow + halfRows + 1, endRow, startColumn, endColumn));
+        if (gridHasMoreRowsThanColumns(halfRows, halfColumn)) {
+            splitGridUpByRows(halfRows);
         } else {
-            invokeAll(new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow,
-                    endRow, startColumn , startColumn + halfColumn),
-                    new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow, endRow,
-                     startColumn + halfColumn + 1, endColumn));
+            splitGridUpByColumns(halfColumn);
         }
     }
 
+    private boolean isGridSmallEnoughToComputeDirectly() {
+        return getAreaOfGrid() < 20;
+    }
+
+    private int getAreaOfGrid() {
+        return (endRow - startRow) * (endColumn - startColumn);
+    }
+
+    private boolean gridHasMoreRowsThanColumns(int halfRows, int halfColumn) {
+        return halfRows > halfColumn;
+    }
+
+    private void splitGridUpByRows(int halfRows) {
+        invokeAll(new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow,
+                                         startRow + halfRows, startColumn, endColumn),
+                new GameOfLifeAdvancer(initialBoard,
+                destinationBoard, startRow + halfRows, endRow, startColumn, endColumn));
+    }
+
+    private void splitGridUpByColumns(int halfColumn) {
+        invokeAll(new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow,
+                                         endRow, startColumn , startColumn + halfColumn),
+                  new GameOfLifeAdvancer(initialBoard, destinationBoard, startRow, endRow,
+                                         startColumn + halfColumn, endColumn));
+    }
+
     private void computeDirectly() {
-        for (int row = startRow; row <= endRow; row++) {
-            for (int column = startColumn; column <= endColumn; column++) {
+        for (int row = startRow; row < endRow; row++) {
+            for (int column = startColumn; column < endColumn; column++) {
                 int numberOfNeighbors = getNumberOfNeighbors(row, column);
 
                 if (initialBoard[row][column]) {
@@ -98,9 +118,5 @@ public class GameOfLifeAdvancer extends RecursiveAction {
         }
 
         return neighborCount;
-    }
-
-    private int getArea() {
-        return (endRow - startRow) * (endColumn - startColumn);
     }
 }
